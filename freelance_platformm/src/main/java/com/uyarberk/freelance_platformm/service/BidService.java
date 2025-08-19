@@ -24,6 +24,7 @@ public class BidService {
     private final BidRepository bidRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final ChatService chatService;
     
     public BidResponse createBid(CreateBidRequest request, Long userId) {
         // Post'u bul
@@ -130,10 +131,20 @@ public class BidService {
         
         bidRepository.save(bid);
         
+        // Chat odası oluştur
+        try {
+            chatService.createChatFromBid(bidId);
+            log.info("Chat odası oluşturuldu. BidId: {}", bidId);
+        } catch (Exception e) {
+            log.error("Chat oluşturulurken hata: {}", e.getMessage());
+            // Chat oluşturulamazsa bid kabul işlemini geri alma
+            // İsterseniz burada rollback yapabilirsiniz
+        }
+        
         log.info("Bid kabul edildi. BidId: {}, PostId: {}, FreelancerId: {}", 
                 bidId, post.getId(), bid.getUser().getId());
         
-        return "Teklif başarıyla kabul edildi";
+        return "Teklif başarıyla kabul edildi ve chat odası oluşturuldu";
     }
     
     public String rejectBid(Long bidId, Long employerId) {
