@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Token'dan userId çıkar ve User objesini getir
             Long userId = jwtUtil.extractUserId(token);
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                    .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı. ID: " + userId));
 
             // Authentication nesnesi oluştur (Principal = User objesi)
             UsernamePasswordAuthenticationToken authentication =

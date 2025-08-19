@@ -9,6 +9,10 @@ import com.uyarberk.freelance_platformm.service.PostService;
 import com.uyarberk.freelance_platformm.service.PostLikeService;
 import com.uyarberk.freelance_platformm.dto.PostLikeDto;
 import com.uyarberk.freelance_platformm.dto.PostLikeSummaryDto;
+import com.uyarberk.freelance_platformm.service.CommentService;
+import com.uyarberk.freelance_platformm.dto.CreateCommentRequest;
+import com.uyarberk.freelance_platformm.dto.CommentResponse;
+import com.uyarberk.freelance_platformm.dto.UpdateCommentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +31,7 @@ public class PostController {
 
     private final PostService postService;
     private final PostLikeService postLikeService;
+    private final CommentService commentService;
 
     @PreAuthorize("hasRole('EMPLOYER')")
     @PostMapping(consumes = {"multipart/form-data"})
@@ -128,5 +133,37 @@ public class PostController {
     public ResponseEntity<Long> getLikeCount(@PathVariable Long id) {
         long count = postLikeService.getLikeCount(id);
         return ResponseEntity.ok(count);
+    }
+
+    // ============= COMMENT ENDPOINTS =============
+    
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<CommentResponse> createComment(@PathVariable Long id, @Valid @RequestBody CreateCommentRequest request, @AuthenticationPrincipal User user) {
+        CommentResponse response = commentService.createComment(id, request, user.getId());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<CommentResponse>> getPostComments(@PathVariable Long id) {
+        List<CommentResponse> comments = commentService.getPostComments(id);
+        return ResponseEntity.ok(comments);
+    }
+
+    @GetMapping("/{id}/comments/count")
+    public ResponseEntity<Long> getCommentCount(@PathVariable Long id) {
+        long count = commentService.getCommentCount(id);
+        return ResponseEntity.ok(count);
+    }
+
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long commentId, @Valid @RequestBody UpdateCommentRequest request, @AuthenticationPrincipal User user) {
+        CommentResponse response = commentService.updateComment(commentId, request, user.getId());
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal User user) {
+        commentService.deleteComment(commentId, user.getId());
+        return ResponseEntity.ok("Yorum silindi");
     }
  }

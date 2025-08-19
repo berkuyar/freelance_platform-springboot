@@ -103,10 +103,10 @@ public class PostService {
         response.setLikeCount(postLikeRepository.countByPost(post));
         if (currentUserId != null) {
             User currentUser = userRepository.findById(currentUserId).orElse(null);
-            response.setIsLikedByCurrentUser(currentUser != null && 
+            response.setLikedByCurrentUser(currentUser != null && 
                 postLikeRepository.existsByUserAndPost(currentUser, post));
         } else {
-            response.setIsLikedByCurrentUser(false);
+            response.setLikedByCurrentUser(false);
         }
         
         return response;

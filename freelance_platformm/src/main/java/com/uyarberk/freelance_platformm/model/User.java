@@ -23,24 +23,24 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(unique = true)
-    @NotBlank(message = "Username is required")
+    @NotBlank(message = "Kullanıcı adı gereklidir")
     @Size(min = 3, max = 50)
     private String username;
 
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "Ad gereklidir")
     @Size(max = 100)
     private String name;
 
-    @NotBlank(message = "Surname is required")
+    @NotBlank(message = "Soyad gereklidir")
     @Size(max = 100)
     private String surname;
 
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "Şifre gereklidir")
     @Size(min = 6)
     private String password;
 
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email is required")
+    @Email(message = "Geçersiz e-posta formatı")
+    @NotBlank(message = "E-posta gereklidir")
     @Column(unique = true)
     private String email;
 

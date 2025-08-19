@@ -22,7 +22,7 @@ public class UserService {
 
     public UserProfileDto getUserProfile(Long userId) {
 
-          User user =  userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found"));
+          User user =  userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("Kullanıcı bulunamadı"));
 
           UserProfileDto userProfileDto = new UserProfileDto();
 
@@ -43,7 +43,7 @@ public class UserService {
         public UserProfileDto updateUserProfile(Long userId, UpdateProfileRequest userProfileDto) {
 
           User user = userRepository.findById(userId).orElseThrow(()
-                  -> new UserNotFoundException("User not found"));
+                  -> new UserNotFoundException("Kullanıcı bulunamadı"));
             user.setName(userProfileDto.getName());
             user.setCity(userProfileDto.getCity());
             user.setPhone(userProfileDto.getPhone());
@@ -67,7 +67,7 @@ public class UserService {
 
         public UserStatsDto getUserStats(Long userId) {
 
-          User user  = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found"));
+          User user  = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("Kullanıcı bulunamadı"));
 
           Long totalPosts = userRepository.countPostsByUserId(userId);
           Long totalBids = userRepository.countBidsByUserId(userId);
@@ -84,20 +84,20 @@ public class UserService {
 
         @Transactional
         public void deleteAccount(Long userId) {
-          User user = userRepository.findActiveById(userId).orElseThrow(()-> new UserNotFoundException("User not found"));
+          User user = userRepository.findActiveById(userId).orElseThrow(()-> new UserNotFoundException("Kullanıcı bulunamadı"));
           user.softDelete();
           userRepository.save(user);
         }
         @Transactional
         public void restoreAccount(Long userId) {
-          User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found"));
+          User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("Kullanıcı bulunamadı"));
           user.restore();
           userRepository.save(user);
 
         }
          @Transactional
         public void changePassword(Long userId, ChangePasswordDto changePasswordDto) {
-          User user =  userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found"));
+          User user =  userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("Kullanıcı bulunamadı"));
           if(!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
                throw new RuntimeException("Eski şifre yanlış");
           }

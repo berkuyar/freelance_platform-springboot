@@ -99,7 +99,7 @@ public class NotificationService {
     @Transactional
     public void createSystemNotification(Long userId, String title, String message) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
         
         Notification notification = new Notification();
         notification.setTitle(title);

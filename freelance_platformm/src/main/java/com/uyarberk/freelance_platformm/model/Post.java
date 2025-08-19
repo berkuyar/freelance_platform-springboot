@@ -19,15 +19,15 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Title is required")
+    @NotBlank(message = "Başlık gereklidir")
     @Size(max = 255)
     private String title;
 
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "Açıklama gereklidir")
     @Size(max = 2000)
     private String description;
 
-    @NotBlank(message = "Category is required")
+    @NotBlank(message = "Kategori gereklidir")
     private String category;
 
     @DecimalMin(value = "0.0", inclusive = false)
@@ -53,6 +53,9 @@ public class Post {
 
     @Column(length = 100)
     private String attachmentName; // Dosya adı
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Comment> comments;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

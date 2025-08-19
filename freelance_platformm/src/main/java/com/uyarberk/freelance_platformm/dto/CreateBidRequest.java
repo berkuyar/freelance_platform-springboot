@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 public class CreateBidRequest {
     
-    @NotNull(message = "Post ID is required")
+    @NotNull(message = "Post ID gereklidir")
     private Long postId;
     
-    @DecimalMin(value = "0.0", inclusive = false, message = "Bid amount must be positive")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Teklif miktarı pozitif olmalıdır")
     private double miktar;
     
-    @Size(max = 1000, message = "Message too long")
+    @Size(max = 1000, message = "Mesaj çok uzun")
     private String message;
 }
