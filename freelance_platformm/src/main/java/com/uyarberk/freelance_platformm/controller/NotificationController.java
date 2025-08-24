@@ -6,7 +6,11 @@ import com.uyarberk.freelance_platformm.model.User;
 import com.uyarberk.freelance_platformm.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import java.security.Principal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -79,5 +83,32 @@ public class NotificationController {
             @RequestParam String message) {
         notificationService.createSystemNotification(userId, title, message);
         return ResponseEntity.ok().build();
+    }
+
+    @MessageMapping("/notifications/subscribe")
+    @SendToUser("/queue/notifications")
+    public List<NotificationResponse> subscribeToNotifications(Principal principal) {
+        if (principal != null) {
+            Long userId = Long.parseLong(principal.getName());
+            return notificationService.getUnreadNotifications(userId);
+        }
+        return List.of();
+    }
+
+    @MessageMapping("/notifications/markAsRead")
+    public void markNotificationAsRead(Long notificationId, Principal principal) {
+        if (principal != null) {
+            notificationService.markAsRead(notificationId);
+        }
+    }
+
+    @MessageMapping("/notifications/getUnreadCount")
+    @SendToUser("/queue/unreadCount")
+    public Long getUnreadCountWebSocket(Principal principal) {
+        if (principal != null) {
+            Long userId = Long.parseLong(principal.getName());
+            return notificationService.getUnreadCount(userId);
+        }
+        return 0L;
     }
 }

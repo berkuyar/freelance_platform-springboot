@@ -9,6 +9,7 @@ import com.uyarberk.freelance_platformm.repository.NotificationRepository;
 import com.uyarberk.freelance_platformm.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public void createBidNotification(Post post, Bid bid) {
@@ -38,6 +40,7 @@ public class NotificationService {
         notification.setRelatedBidId(bid.getId());
         
         notificationRepository.save(notification);
+        sendWebSocketNotification(employer.getId(), NotificationResponse.fromEntity(notification));
         log.info("Bid notification created for user: {} for post: {}", employer.getId(), post.getId());
     }
 
@@ -55,6 +58,7 @@ public class NotificationService {
         notification.setRelatedBidId(bid.getId());
         
         notificationRepository.save(notification);
+        sendWebSocketNotification(freelancer.getId(), NotificationResponse.fromEntity(notification));
         log.info("Bid accepted notification created for user: {}", freelancer.getId());
     }
 
@@ -72,6 +76,7 @@ public class NotificationService {
         notification.setRelatedBidId(bid.getId());
         
         notificationRepository.save(notification);
+        sendWebSocketNotification(freelancer.getId(), NotificationResponse.fromEntity(notification));
         log.info("Bid rejected notification created for user: {}", freelancer.getId());
     }
 
@@ -93,6 +98,7 @@ public class NotificationService {
         notification.setRelatedPostId(post.getId());
         
         notificationRepository.save(notification);
+        sendWebSocketNotification(employer.getId(), NotificationResponse.fromEntity(notification));
         log.info("Deadline reminder notification created for post: {}", post.getId());
     }
 
@@ -108,6 +114,7 @@ public class NotificationService {
         notification.setUser(user);
         
         notificationRepository.save(notification);
+        sendWebSocketNotification(userId, NotificationResponse.fromEntity(notification));
         log.info("System notification created for user: {}", userId);
     }
 
@@ -169,5 +176,18 @@ public class NotificationService {
         LocalDateTime before = LocalDateTime.now().minusDays(days);
         notificationRepository.deleteByUserIdAndCreatedAtBefore(userId, before);
         log.info("Old notifications deleted for user: {} before: {}", userId, before);
+    }
+
+    private void sendWebSocketNotification(Long userId, NotificationResponse notificationResponse) {
+        try {
+            messagingTemplate.convertAndSendToUser(
+                userId.toString(), 
+                "/queue/notifications", 
+                notificationResponse
+            );
+            log.info("WebSocket notification sent to user: {}", userId);
+        } catch (Exception e) {
+            log.error("Failed to send WebSocket notification to user: {}", userId, e);
+        }
     }
 }

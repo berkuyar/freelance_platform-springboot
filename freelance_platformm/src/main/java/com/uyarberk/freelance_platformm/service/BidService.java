@@ -25,6 +25,7 @@ public class BidService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final ChatService chatService;
+    private final NotificationService notificationService;
     
     public BidResponse createBid(CreateBidRequest request, Long userId) {
         // Post'u bul
@@ -53,6 +54,9 @@ public class BidService {
         bid.setUser(user);
         
         Bid savedBid = bidRepository.save(bid);
+        
+        // Bildirim gönder
+        notificationService.createBidNotification(post, savedBid);
         
         return convertToResponse(savedBid);
     }
@@ -119,17 +123,23 @@ public class BidService {
         post.setStatus(Post.Status.IN_PROGRESS);
         postRepository.save(post);
         
+        // Bid'i kaydet
+        bidRepository.save(bid);
+        
+        // Kabul bildirimi gönder
+        notificationService.createBidAcceptedNotification(bid);
+        
         // Aynı post'taki diğer PENDING bid'leri otomatik red et
         List<Bid> otherBids = bidRepository.findByPostIdAndStatus(post.getId(), Bid.Status.PENDING);
         for (Bid otherBid : otherBids) {
             if (!otherBid.getId().equals(bidId)) {
                 otherBid.setStatus(Bid.Status.REJECTED);
                 bidRepository.save(otherBid);
+                // Otomatik red edilenler için de bildirim gönder
+                notificationService.createBidRejectedNotification(otherBid);
                 log.info("Otomatik red edildi. BidId: {} - Kabul edilen bid: {}", otherBid.getId(), bidId);
             }
         }
-        
-        bidRepository.save(bid);
         
         // Chat odası oluştur
         try {
@@ -165,6 +175,9 @@ public class BidService {
         // Bid'i red et
         bid.setStatus(Bid.Status.REJECTED);
         bidRepository.save(bid);
+        
+        // Bildirim gönder
+        notificationService.createBidRejectedNotification(bid);
         
         log.info("Bid red edildi. BidId: {}, PostId: {}, FreelancerId: {}", 
                 bidId, bid.getPost().getId(), bid.getUser().getId());
