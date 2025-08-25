@@ -31,7 +31,6 @@ public class ChatController {
 
     private final ChatService chatService;
     private final MessageService messageService;
-
     // REST Endpoint: Kullanıcının chat listesini getir
     @GetMapping("/my-chats")
     public ResponseEntity<List<ChatResponse>> getMyChats(@AuthenticationPrincipal User user) {
