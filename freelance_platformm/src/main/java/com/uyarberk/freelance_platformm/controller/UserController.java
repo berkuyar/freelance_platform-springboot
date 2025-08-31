@@ -2,6 +2,7 @@ package com.uyarberk.freelance_platformm.controller;
 
 
 import com.uyarberk.freelance_platformm.dto.ChangePasswordDto;
+import com.uyarberk.freelance_platformm.dto.PublicUserProfileDto;
 import com.uyarberk.freelance_platformm.dto.UpdateProfileRequest;
 import com.uyarberk.freelance_platformm.dto.UserProfileDto;
 import com.uyarberk.freelance_platformm.dto.UserStatsDto;
@@ -54,6 +55,12 @@ public class UserController {
         Long userId = user.getId();
         userService.changePassword(userId, changePasswordDto);
         return ResponseEntity.ok("Şifre güncellendi");
+     }
+
+     @GetMapping("/{userId}")
+    public ResponseEntity<PublicUserProfileDto> getUserById(@PathVariable Long userId) {
+        PublicUserProfileDto publicUserProfileDto = userService.getPublicUserProfile(userId);
+        return ResponseEntity.ok(publicUserProfileDto);
      }
 
 

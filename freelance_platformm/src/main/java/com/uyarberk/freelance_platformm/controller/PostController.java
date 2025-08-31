@@ -34,14 +34,12 @@ public class PostController {
     private final CommentService commentService;
 
     @PreAuthorize("hasRole('EMPLOYER')")
-    @PostMapping(consumes = {"multipart/form-data"})
+    @PostMapping
     public ResponseEntity<PostResponse> createPost(
-            @RequestPart("post") @Valid CreatePostRequest request,
-            @RequestPart(value = "attachment", required = false) MultipartFile attachment,
+            @RequestBody @Valid CreatePostRequest request,
             @AuthenticationPrincipal User user) {
 
-               request.setAttachment(attachment);
-             PostResponse response = postService.createPost(request, user.getId());
+        PostResponse response = postService.createPost(request, user.getId());
         
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

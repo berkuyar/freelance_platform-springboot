@@ -2,6 +2,7 @@ package com.uyarberk.freelance_platformm.service;
 
 
 import com.uyarberk.freelance_platformm.dto.ChangePasswordDto;
+import com.uyarberk.freelance_platformm.dto.PublicUserProfileDto;
 import com.uyarberk.freelance_platformm.dto.UpdateProfileRequest;
 import com.uyarberk.freelance_platformm.dto.UserProfileDto;
 import com.uyarberk.freelance_platformm.dto.UserStatsDto;
@@ -108,5 +109,22 @@ public class UserService {
               userRepository.save(user);
 
           }
+
+    public PublicUserProfileDto getPublicUserProfile(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı"));
+
+        PublicUserProfileDto publicUserProfileDto = new PublicUserProfileDto();
+        publicUserProfileDto.setId(user.getId());
+        publicUserProfileDto.setUsername(user.getUsername());
+        publicUserProfileDto.setName(user.getName());
+        publicUserProfileDto.setSurname(user.getSurname());
+        publicUserProfileDto.setBio(user.getBio());
+        publicUserProfileDto.setCity(user.getCity());
+        publicUserProfileDto.setSkills(user.getSkills());
+        publicUserProfileDto.setRole(user.getRole());
+        publicUserProfileDto.setCreatedAt(user.getCreatedAt());
+
+        return publicUserProfileDto;
+    }
 
 }
